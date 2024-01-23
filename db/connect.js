@@ -2,23 +2,11 @@ const { MongoClient, Db } = require("mongodb");
 
 let client = null;
 
-function connect(url, callback) {
-  if (client === null) {
-    client = new MongoClient(url);
-
-    client.connect((err) => {
-      if (err) {
-        client = null;
-        callback(err);
-      } else {
-        callback();
-      }
-    });
-  } else {
-    callback();
-  }
+async function connecter(url, callback) {
+  client = new MongoClient(url);
+  await client.connect();
+  callback();
 }
-
 function db() {
   var db = new Db(client, "dbOK");
   return db;
@@ -31,4 +19,4 @@ function fermer() {
   }
 }
 
-module.exports = { connect, client, db, fermer };
+module.exports = { connecter, db, fermer };
