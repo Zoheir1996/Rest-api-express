@@ -1,5 +1,5 @@
 const { Utilisateur } = require("../model/utilisateur");
-const { ObjectID } = require("mongodb");
+const { ObjectId } = require("mongodb");
 const client = require("../db/connect");
 
 const ajouterUtilisateur = async (req, res) => {
@@ -14,29 +14,33 @@ const ajouterUtilisateur = async (req, res) => {
       .collection("utilisateurs")
       .insertOne(utilisateur);
 
-    res.status(200).json(result);
+    res
+      .status(200)
+      .json({ result: "L'utilisateur a été ajouté avec succès", data: result });
   } catch (error) {
     console.log(error);
-    res.status(501).json(error);
+    res.status(501).json({ error: "L'utilisateur n'a pas été ajouté" });
   }
 };
 
 const getUtilisateur = async (req, res) => {
   try {
-    let cursor = client
+    const id = req.params.id;
+    console.log("ID de l'utilisateur :", id);
+
+    let result = await client
       .db()
       .collection("utilisateurs")
-      .find()
-      .sort({ noms: 1 });
-    let result = await cursor.toArray();
-    if (result.length > 0) {
-      res.status(200).json(result);
+      .findOne({ _id: new ObjectId(id) });
+    console.log(result);
+    if (result) {
+      return res.json(result);
     } else {
-      res.status(204).json({ msg: "Aucun utilisateur trouvé" });
+      return res.status(404).json({ error: "User not found" });
     }
   } catch (error) {
-    console.log(error);
-    res.status(501).json(error);
+    console.error(error);
+    return res.status(500).json({ error });
   }
 };
 
@@ -45,10 +49,16 @@ const updateUtilisateur = async (req, res) => {
     let noms = req.body.noms;
     let adresse = req.body.adresse;
     let telephone = req.body.telephone;
+
+    let id = req.params.id;
+
     let result = await client
       .db()
       .collection("utilisateurs")
-      .updateOne({ _id: id }, { $set: { noms, adresse, telephone } });
+      .updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { noms, adresse, telephone } }
+      );
 
     if (result.modifiedCount === 1) {
       res.status(200).json({ msg: "Modification réussie" });
@@ -63,20 +73,27 @@ const updateUtilisateur = async (req, res) => {
 
 const deleteUtilisateur = async (req, res) => {
   try {
-    let id = new ObjectID(req.params.id);
+    const id = req.params.id;
+    console.log("ID de l'utilisateur :", id);
+
+    if (!ObjectId.isValid(id)) {
+      console.log("ID invalide :", id);
+      return res.status(400).json({ error: "Invalid ObjectId format" });
+    }
+
     let result = await client
       .db()
       .collection("utilisateurs")
-      .deleteOne({ _id: id });
+      .deleteOne({ _id: new ObjectId(id) });
+
     if (result.deletedCount === 1) {
-      res.status(200).json({ msg: "Suppression réussie" });
+      return res.json({ message: "User deleted successfully" });
     } else {
-      res.status(404).json({ msg: "Cet utilisateur n'existe pas" });
+      return res.status(404).json({ error: "User not found" });
     }
   } catch (error) {
-    console.log(error);
-
-    res.status(501).json(error);
+    console.error(error);
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
