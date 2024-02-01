@@ -25,18 +25,14 @@ const ajouterUtilisateur = async (req, res) => {
 
 const getUtilisateur = async (req, res) => {
   try {
-    const id = req.params.id;
-    console.log("ID de l'utilisateur :", id);
+    let id = new ObjectId(req.params.id);
+    let cursor = client.db().collection("utilisateurs").find({ _id: id });
+    let result = await cursor.toArray();
 
-    let result = await client
-      .db()
-      .collection("utilisateurs")
-      .findOne({ _id: new ObjectId(id) });
-    console.log(result);
-    if (result) {
-      return res.json(result);
+    if (result.length > 0) {
+      return res.status(200).json(result);
     } else {
-      return res.status(404).json({ error: "User not found" });
+      return res.status(204).json({ msg: "User not found" });
     }
   } catch (error) {
     console.error(error);
@@ -44,20 +40,35 @@ const getUtilisateur = async (req, res) => {
   }
 };
 
-const updateUtilisateur = async (req, res) => {
+const getTousUtilisateur = async (req, res) => {
   try {
-    let noms = req.body.noms;
-    let adresse = req.body.adresse;
-    let telephone = req.body.telephone;
+    let cursor = client.db().collection("utilisateurs").find();
 
-    let id = req.params.id;
+    let result = await cursor.toArray();
+
+    if (result.length > 0) {
+      res.status(200).json(result);
+    } else {
+      return res.status(404).json({ error: "Utilisateur non trouvé" });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error });
+  }
+};
+const modifierUtilisateur = async (req, res) => {
+  try {
+    let id = new ObjectId(req.params.id);
+    let nNoms = req.body.noms;
+    let nAdresse = req.body.adresse;
+    let nTelephone = req.body.telephone;
 
     let result = await client
       .db()
       .collection("utilisateurs")
       .updateOne(
         { _id: new ObjectId(id) },
-        { $set: { noms, adresse, telephone } }
+        { $set: { noms: nNoms, adresse: nAdresse, telephone: nTelephone } }
       );
 
     if (result.modifiedCount === 1) {
@@ -71,10 +82,9 @@ const updateUtilisateur = async (req, res) => {
   }
 };
 
-const deleteUtilisateur = async (req, res) => {
+const supprimerUtilisateur = async (req, res) => {
   try {
     const id = req.params.id;
-    console.log("ID de l'utilisateur :", id);
 
     if (!ObjectId.isValid(id)) {
       console.log("ID invalide :", id);
@@ -99,7 +109,8 @@ const deleteUtilisateur = async (req, res) => {
 
 module.exports = {
   ajouterUtilisateur,
+  getTousUtilisateur,
   getUtilisateur,
-  updateUtilisateur,
-  deleteUtilisateur,
+  modifierUtilisateur,
+  supprimerUtilisateur,
 };
