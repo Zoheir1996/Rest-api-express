@@ -7,7 +7,8 @@ const ajouterUtilisateur = async (req, res) => {
     let utilisateur = new Utilisateur(
       req.body.noms,
       req.body.adresse,
-      req.body.telephone
+      req.body.telephone,
+      req.body.country
     );
     let result = await client
       .db()
@@ -62,13 +63,21 @@ const modifierUtilisateur = async (req, res) => {
     let nNoms = req.body.noms;
     let nAdresse = req.body.adresse;
     let nTelephone = req.body.telephone;
+    let nCountry = req.body.country;
 
     let result = await client
       .db()
       .collection("utilisateurs")
       .updateOne(
         { _id: new ObjectId(id) },
-        { $set: { noms: nNoms, adresse: nAdresse, telephone: nTelephone } }
+        {
+          $set: {
+            noms: nNoms,
+            adresse: nAdresse,
+            telephone: nTelephone,
+            country: nCountry,
+          },
+        }
       );
 
     if (result.modifiedCount === 1) {
