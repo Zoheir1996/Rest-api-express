@@ -1,64 +1,84 @@
 <template>
   <div class="form-container">
     <h3>Formulaire utilisateur</h3>
-
-    <form @submit.prevent="handleSubmit">
+    
+    <form id="signupForm">
       <div class="form-group">
-        <label for="noms">Nom</label>
+        <label for="name">Nom</label>
         <input
-          v-model="formData.noms"
+          v-model="User.name"
           type="text"
-          id="noms"
+          id="name"
           name="firstname"
           placeholder="ton nom"
+          required
         />
       </div>
 
       <div class="form-group">
-        <label for="lname">Adresse postale</label>
+        <label for="adresse">Adresse postale</label>
         <input
-          v-model="formData.adresse"
+          v-model="User.adresse"
           type="text"
           id="adresse"
           name="adresse"
           placeholder="ton adresse..."
+          required
         />
       </div>
 
       <div class="form-group">
         <label for="lname">Telephone</label>
-        <input v-model="formData.telephone" type="text" id="lname" name="email" />
+        <input v-model="User.telephone" type="text" id="lname" name="email" required />
       </div>
 
       <div class="form-group">
         <label for="country">Country</label>
-        <select v-model="formData.country" id="country" name="country">
+        <select v-model="User.country" id="country" name="country" required>
           <option value="australia">Australia</option>
           <option value="canada">Canada</option>
           <option value="usa">USA</option>
         </select>
       </div>
 
-      <button type="submit">Submit</button>
+      <button @click.prevent="handleSubmit">Submit</button>
+
+      <button onclick="window.location.href='/users'">Users</button>
     </form>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
 export default {
   data() {
     return {
-      formData: {
+      User: {
         name: '',
-        lastName: '',
+        adresse: '',
+        telephone: '',
         country: ''
       }
     }
   },
   methods: {
-    handleSubmit() {
-      // Logique pour traiter les données du formulaire
-      console.log('Données du formulaire:', this.formData)
+    handleSubmit(event) {
+      event.preventDefault()
+      let newUser = {
+        noms: this.User.name,
+        adresse: this.User.adresse,
+        telephone: this.User.telephone,
+        country: this.User.country
+      }
+      console.log(newUser)
+      axios
+        .post('http://localhost:3000/api/v1/utilisateurs/', newUser)
+        .then((response) => {
+          console.log(response)
+        })
+        .catch((error) => {
+          console.log(error)
+        })
     }
   }
 }
@@ -67,7 +87,7 @@ export default {
 <style scoped>
 .form-container {
   max-width: 400px;
-  margin: auto;
+  margin: auto; /* Pour centrer le conteneur */;
 }
 
 form {
@@ -75,6 +95,7 @@ form {
   padding: 20px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
 }
 
 h3 {
@@ -112,6 +133,7 @@ button {
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s;
+  margin-bottom: 10px;
 }
 
 button:hover {
