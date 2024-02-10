@@ -1,9 +1,11 @@
 <script setup>
-import TheForm from '../components/TheForm.vue'
+import TheForm from '@/components/TheForm.vue'
 </script>
 
 <template>
-  <main>
-    <TheForm />
-  </main>
+
+    <form @submit.prevent="handleSubmit">
+      <TheForm />
+    </form>
+
 </template>
