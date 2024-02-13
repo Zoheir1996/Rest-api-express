@@ -1,23 +1,30 @@
 <template>
-  <table class="table is-striped is-bordered">
-    <thead>
-      <tr>
-        <th>Nom</th>
-        <th>Adresse</th>
-        <th>Téléphone</th>
-        <th>Pays</th>
-      </tr>
-    </thead>
-
-    <tbody>
-      <tr v-for="user_alias in User" :key="user_alias.id">
-        <td>{{ user_alias.noms }}</td>
-        <td>{{ user_alias.adresse }}</td>
-        <td>{{ user_alias.telephone }}</td>
-        <td>{{ user_alias.country }}</td>
-      </tr>
-    </tbody>
-  </table>
+  <div>
+    <div class="has-text-centered" style="color: white">Liste des utilisateurs</div>
+    <div class="table-container">
+      <table class="table is-striped is-bordered">
+        <thead>
+          <tr>
+            <th class="has-text-weight-bold">Nom</th>
+            <th class="has-text-weight-bold">Adresse</th>
+            <th class="has-text-weight-bold">Téléphone</th>
+            <th class="has-text-weight-bold">Pays</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="user_alias in User" :key="user_alias.id">
+            <td>{{ user_alias.noms }}</td>
+            <td>{{ user_alias.adresse }}</td>
+            <td>{{ user_alias.telephone }}</td>
+            <td>{{ user_alias.country }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <button onclick="window.location.href='/form'">Ajouter un utilisateur</button>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -44,6 +51,9 @@ export default {
 }
 </script>
 
-<style>
-/* Aucun style spécifique n'est nécessaire, vous pouvez supprimer cette section si vous n'en avez pas besoin */
+<style scoped>
+.table-container {
+  max-height: 400px;
+  overflow-y: auto;
+}
 </style>
