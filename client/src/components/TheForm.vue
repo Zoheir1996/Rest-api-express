@@ -1,7 +1,7 @@
 <template>
   <div class="form-container">
     <h3>Formulaire utilisateur</h3>
-    
+
     <form id="signupForm">
       <div class="form-group">
         <label for="name">Nom</label>
@@ -12,6 +12,8 @@
           name="firstname"
           placeholder="ton nom"
           required
+          minlength="2"
+          maxlength="40"
         />
       </div>
 
@@ -50,6 +52,19 @@
 
 <script>
 import axios from 'axios'
+import useVuelidate from '@vuelidate/core'
+import { required, minLength, maxLength } from '@vuelidate/validators'
+import { reactive } from 'vue'
+
+const rules = {
+  User: {
+    name: { required, minLength: minLength(2), maxLength: maxLength(40) },
+    adresse: { required },
+    telephone: { required },
+    country: { required }
+  }
+}
+const v$ = useVuelidate(rules, reactive({ User: {} }))
 export default {
   data() {
     return {
@@ -61,9 +76,9 @@ export default {
       }
     }
   },
+
   methods: {
-    handleSubmit(event) {
-      event.preventDefault()
+    handleSubmit() {
       let newUser = {
         noms: this.User.name,
         adresse: this.User.adresse,
@@ -79,6 +94,14 @@ export default {
         .catch((error) => {
           console.log(error)
         })
+    },
+    async submitForm() {
+      const result = await v$.value.$validate()
+      if (result) {
+        console.log('Form is valid')
+      } else {
+        console.log('Form is invalid')
+      }
     }
   }
 }
@@ -87,7 +110,8 @@ export default {
 <style scoped>
 .form-container {
   max-width: 400px;
-  margin: auto; /* Pour centrer le conteneur */;
+  margin: auto; /* Pour centrer le conteneur */
+  color: white;
 }
 
 form {
